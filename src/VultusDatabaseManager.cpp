@@ -20,11 +20,3 @@ void VultusDatabaseManager::connectToDatabase()
     }
 }
 
-bool VultusDatabaseManager::authentication(QString _login, QString _password)
-{
-    qDebug() << _login;
-    qDebug() << _password;
-
-    return true;
-}
-

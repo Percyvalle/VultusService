@@ -14,7 +14,6 @@ public:
     ~VultusDatabaseManager();
 
     void connectToDatabase();
-    bool authentication(QString _login, QString _password);
 
 private:
     QSqlDatabase m_manager = QSqlDatabase::addDatabase("QPSQL");
