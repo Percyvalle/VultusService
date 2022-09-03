@@ -13,11 +13,14 @@ public:
     VultusDatabaseManager();
     ~VultusDatabaseManager();
 
-    void connectToDatabase();
+    static void connectToDatabase();
+
+    static QJsonArray getUsers();
+    static QJsonArray authToDatabase(QString _login, QString _password);
 
 private:
-    QSqlDatabase m_manager = QSqlDatabase::addDatabase("QPSQL");
-    QSqlQuery *m_query = new QSqlQuery;
+    static QSqlDatabase m_manager;
+    static QSqlQuery *m_query;
 };
 
 #endif // VULTUSDATABASEMANAGER_H

@@ -1,18 +1,17 @@
 #include "VultusServiceCommandHandler.h"
 
-VultusServiceCommandHandler::VultusServiceCommandHandler() : QObject()
+
+VultusServiceCommandHandler::VultusServiceCommandHandler(QObject *parent)
+    : QObject{parent}
 {
 
 }
 
-void VultusServiceCommandHandler::processCommand(uint _command, QTcpSocket *_sender, QDataStream &data)
+void VultusServiceCommandHandler::processCommand(QJsonArray _command, QTcpSocket *sender)
 {
-    if(_command == authToServer){
-        QVariant login;
-        data >> login;
-        qDebug() << "Аутентификация";
-        emit authenticationIsDone(login.value<QString>(), _sender);
-    } else if (_command == getOnlineUsers){
-        qDebug() << "Список онлайн юзеров";
+    QJsonObject command_object = _command[0].toObject();
+    QString command = command_object["COMMAND"].toString();
+    if(command == "authToServer"){
+        qDebug() << command;
     }
 }

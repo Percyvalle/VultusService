@@ -1,25 +1,22 @@
 #ifndef VULTUSSERVICECOMMANDHANDLER_H
 #define VULTUSSERVICECOMMANDHANDLER_H
 
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
 #include <QTcpSocket>
 #include <QObject>
-
-
-enum command{
-    authToServer = 0,
-    getOnlineUsers = 1
-};
 
 class VultusServiceCommandHandler : public QObject
 {
     Q_OBJECT
 public:
-    VultusServiceCommandHandler();
+    explicit VultusServiceCommandHandler(QObject *parent = nullptr);
 
-    void processCommand(uint _command, QTcpSocket *_sender, QDataStream &data);
+    void processCommand(QJsonArray _command, QTcpSocket* sender);
 
 signals:
-    void authenticationIsDone(QString _login, QTcpSocket *_sender);
+
 };
 
 #endif // VULTUSSERVICECOMMANDHANDLER_H
