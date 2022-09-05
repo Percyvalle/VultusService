@@ -36,7 +36,7 @@ private:
     QVector<QTcpSocket*> m_socket_list;
     QMap<QTcpSocket*, int> m_security_list;
     QMap<QTcpSocket*, QJsonArray> m_online_list;
-    quint16 m_block_size = 0;
+    quint16 m_block_size=0;
     QTcpSocket *m_socket;
     QByteArray m_data;
 };
