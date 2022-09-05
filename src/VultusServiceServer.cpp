@@ -7,7 +7,9 @@ VultusServiceServer::VultusServiceServer()
 
         VultusDatabaseManager::connectToDatabase();
 
-        connect(m_handler, SIGNAL(authSendResponse(QTcpSocket*, QJsonArray)), this, SLOT(addToOnlineClient(QTcpSocket*, QJsonArray)));
+        connect(m_handler, &VultusServiceCommandHandler::authSendResponse, this, &VultusServiceServer::addToOnlineClient);
+        connect(m_handler, &VultusServiceCommandHandler::getUsersResponse, this, &VultusServiceServer::sendToClient);
+        connect(m_handler, &VultusServiceCommandHandler::getIsOnlineUsers, this, &VultusServiceServer::sendIsOnlineUsers);
     } else {
         qDebug() << "Error";
     }
@@ -27,15 +29,16 @@ void VultusServiceServer::incomingConnection(qintptr _socket_discriptor)
 
     m_security_list.insert(m_socket, notsafe);
 
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyReadMessage()));
-    connect(m_socket, SIGNAL(disconnected()), this, SLOT(rmvToOnlineClient()));
-    connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
+    connect(m_socket, &QIODevice::readyRead, this, &VultusServiceServer::readyReadMessage);
+    connect(m_socket, &QAbstractSocket::disconnected, this, &VultusServiceServer::rmvToOnlineClient);
+    connect(m_socket, &QAbstractSocket::disconnected, m_socket, &QObject::deleteLater);
 
     qDebug() << _socket_discriptor;
 }
 
-void VultusServiceServer::sendToClient(QJsonArray _msg)
+void VultusServiceServer::sendToClient(QJsonArray _msg, QTcpSocket *_socket)
 {
+    m_socket = _socket;
     m_data.clear();
     QDataStream out(&m_data, QIODevice::WriteOnly);
 
@@ -47,17 +50,29 @@ void VultusServiceServer::sendToClient(QJsonArray _msg)
     m_socket->write(m_data);
 }
 
-void VultusServiceServer::addToOnlineClient(QTcpSocket *_sender, QJsonArray _reply)
+void VultusServiceServer::addToOnlineClient(QJsonArray _reply, QTcpSocket *_sender)
 {
     m_socket = _sender;
-    m_security_list.insert(_sender, safely);
-    sendToClient(_reply);
+    m_security_list[_sender] = safely;
+    m_online_list.insert(_sender, _reply);
+
+    sendToClient(_reply, _sender);
 }
 
 void VultusServiceServer::rmvToOnlineClient()
 {
     m_socket = (QTcpSocket*)sender();
     m_security_list.remove(m_socket);
+    m_online_list.remove(m_socket);
+}
+
+void VultusServiceServer::sendIsOnlineUsers(QTcpSocket *_sender)
+{
+    QJsonArray online_json_array;
+    for(const QJsonValue &i : m_online_list.first()){
+        online_json_array << i.toObject();
+    }
+    sendToClient(online_json_array, _sender);
 }
 
 void VultusServiceServer::readyReadMessage()
@@ -83,11 +98,12 @@ void VultusServiceServer::readyReadMessage()
 
         QVariant request_var;
         in >> request_var;
+
         QJsonArray request = request_var.toJsonArray();
-        if(m_security_list[m_socket] == safely){
-            qDebug() << "Safe";
-        } else {
+        if(m_security_list[m_socket] == notsafe){
             m_handler->authCommand(request, m_socket);
+        } else {
+            m_handler->processCommand(request, m_socket);
         }
 
     }

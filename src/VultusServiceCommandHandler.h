@@ -9,7 +9,7 @@
 
 #include "VultusDatabaseManager.h"
 
-struct JsonMassage{
+struct JsonMessage{
     static QJsonArray error_msg(const QString _error){
         QJsonObject m_object_jsn;
         QJsonArray m_array_jsn;
@@ -31,7 +31,9 @@ public:
     void authCommand(QJsonArray _command, QTcpSocket*_sender);
 
 signals:
-    void authSendResponse(QTcpSocket *_sender, QJsonArray _response);
+    void authSendResponse(QJsonArray _response, QTcpSocket *_sender);
+    void getUsersResponse(QJsonArray _response, QTcpSocket *_sender);
+    void getIsOnlineUsers(QTcpSocket *_sender);
 };
 
 #endif // VULTUSSERVICECOMMANDHANDLER_H
