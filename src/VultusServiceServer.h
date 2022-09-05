@@ -9,20 +9,9 @@
 #include "VultusDatabaseManager.h"
 #include "VultusServiceCommandHandler.h"
 
-struct JsonMassage{
-    static QJsonArray error_msg(const QString _error){
-        QJsonObject m_object_jsn;
-        QJsonArray m_array_jsn;
-
-        m_object_jsn["ERROR"] = _error;
-        m_array_jsn.append(m_object_jsn);
-        return m_array_jsn;
-    }
-};
-
 enum secure{
-    insecure = 0,
-    securely = 1
+    safely = 1,
+    notsafe = 0
 };
 
 class VultusServiceServer : public QTcpServer
@@ -36,15 +25,15 @@ private slots:
     void incomingConnection(qintptr _socket_discriptor);
 
     void readyReadMessage();
-    void sendToClient(uint _command, QJsonArray _msg);
+    void sendToClient(QJsonArray _msg);
 
-    void addToOnlineClient(QString _login, QTcpSocket* _sender);
+    void addToOnlineClient(QTcpSocket* _sender, QJsonArray _reply);
     void rmvToOnlineClient();
 
 private:
     VultusServiceCommandHandler *m_handler = new VultusServiceCommandHandler;
-    QMap<QTcpSocket*, int> m_socket_list;
-    QMap<QTcpSocket*, QString> m_online;
+    QVector<QTcpSocket*> m_socket_list;
+    QMap<QTcpSocket*, int> m_security_list;
     quint16 m_block_size = 0;
     QTcpSocket *m_socket;
     QByteArray m_data;

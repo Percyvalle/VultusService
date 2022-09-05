@@ -6,7 +6,8 @@ VultusServiceServer::VultusServiceServer()
         qDebug() << "Start";
 
         VultusDatabaseManager::connectToDatabase();
-        VultusDatabaseManager::authToDatabase("admin", "admin");
+
+        connect(m_handler, SIGNAL(authSendResponse(QTcpSocket*, QJsonArray)), this, SLOT(addToOnlineClient(QTcpSocket*, QJsonArray)));
     } else {
         qDebug() << "Error";
     }
@@ -22,7 +23,9 @@ void VultusServiceServer::incomingConnection(qintptr _socket_discriptor)
 {
     m_socket = new QTcpSocket;
     m_socket->setSocketDescriptor(_socket_discriptor);
-    m_socket_list.insert(m_socket, insecure);
+    m_socket_list.append(m_socket);
+
+    m_security_list.insert(m_socket, notsafe);
 
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyReadMessage()));
     connect(m_socket, SIGNAL(disconnected()), this, SLOT(rmvToOnlineClient()));
@@ -31,29 +34,30 @@ void VultusServiceServer::incomingConnection(qintptr _socket_discriptor)
     qDebug() << _socket_discriptor;
 }
 
-void VultusServiceServer::sendToClient(uint _command, QJsonArray _msg)
+void VultusServiceServer::sendToClient(QJsonArray _msg)
 {
     m_data.clear();
     QDataStream out(&m_data, QIODevice::WriteOnly);
 
     out.setVersion(QDataStream::Qt_5_15);
-    out << quint16(0) << QVariant(_command) << QVariant(_msg);
+    out << quint16(0) << QVariant(_msg);
     out.device()->seek(0);
     out << quint16(m_data.size() - sizeof(quint16));
 
     m_socket->write(m_data);
 }
 
-void VultusServiceServer::addToOnlineClient(QString _login, QTcpSocket *_sender)
+void VultusServiceServer::addToOnlineClient(QTcpSocket *_sender, QJsonArray _reply)
 {
-    m_online.insert(_sender, _login);
-    m_socket_list[_sender] = securely;
+    m_socket = _sender;
+    m_security_list.insert(_sender, safely);
+    sendToClient(_reply);
 }
 
 void VultusServiceServer::rmvToOnlineClient()
 {
     m_socket = (QTcpSocket*)sender();
-    m_online.remove(m_socket);
+    m_security_list.remove(m_socket);
 }
 
 void VultusServiceServer::readyReadMessage()
@@ -77,14 +81,15 @@ void VultusServiceServer::readyReadMessage()
             m_block_size = 0;
         }
 
-        addToOnlineClient("gomanov", m_socket);
-        if(m_socket_list.value(m_socket) == securely){
-            QVariant reply_command;
-            in >> reply_command;
-            m_handler->processCommand(reply_command.toJsonArray(), m_socket);
+        QVariant request_var;
+        in >> request_var;
+        QJsonArray request = request_var.toJsonArray();
+        if(m_security_list[m_socket] == safely){
+            qDebug() << "Safe";
         } else {
-            sendToClient(0, JsonMassage::error_msg("insecure"));
+            m_handler->authCommand(request, m_socket);
         }
+
     }
 }
 

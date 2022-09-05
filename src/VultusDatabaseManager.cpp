@@ -71,10 +71,6 @@ QJsonArray VultusDatabaseManager::authToDatabase(QString _login, QString _passwo
         }
     }
 
-    if(profile_main_array.size() != 1){
-        profile_main_object["ERROR"] = "Ошибка аутентификации";
-    }
-
     profile_main_array.append(profile_main_object);
 
     return profile_main_array;
