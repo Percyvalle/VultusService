@@ -47,7 +47,7 @@ QJsonArray VultusDatabaseManager::getUsers()
     return profile_array;
 }
 
-QJsonArray VultusDatabaseManager::getAuth(QString _login, QString _password)
+QJsonArray VultusDatabaseManager::getAuth(const QString _login, const QString _password)
 {
     QJsonObject profile_main_object;
     QJsonArray profile_main_array;

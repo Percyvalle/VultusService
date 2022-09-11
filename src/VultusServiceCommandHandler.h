@@ -30,9 +30,13 @@ public:
     void processCommand(QJsonArray _command, QTcpSocket*_sender);
     void authCommand(QJsonArray _command, QTcpSocket*_sender);
 
+private:
+    QJsonArray generateToken(const int &_id, const QString &_last_name);
+
 signals:
     void authSendResponse(QJsonArray _response, QTcpSocket *_sender);
     void getUsersResponse(QJsonArray _response, QTcpSocket *_sender);
+    void errorResponse(QJsonArray _response, QTcpSocket *_sender);
     void getIsOnlineUsers(QTcpSocket *_sender);
 };
 

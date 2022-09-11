@@ -8,8 +8,9 @@ VultusServiceServer::VultusServiceServer()
         VultusDatabaseManager::connectToDatabase();
 
         connect(m_handler, &VultusServiceCommandHandler::authSendResponse, this, &VultusServiceServer::addToOnlineClient);
-        connect(m_handler, &VultusServiceCommandHandler::getUsersResponse, this, &VultusServiceServer::sendToClient);
         connect(m_handler, &VultusServiceCommandHandler::getIsOnlineUsers, this, &VultusServiceServer::sendIsOnlineUsers);
+        connect(m_handler, &VultusServiceCommandHandler::getUsersResponse, this, &VultusServiceServer::sendToClient);
+        connect(m_handler, &VultusServiceCommandHandler::errorResponse, this, &VultusServiceServer::sendToClient);
     } else {
         qDebug() << "Error";
     }
@@ -69,9 +70,13 @@ void VultusServiceServer::rmvToOnlineClient()
 void VultusServiceServer::sendIsOnlineUsers(QTcpSocket *_sender)
 {
     QJsonArray online_json_array;
-    for(const QJsonValue &i : m_online_list.first()){
-        online_json_array << i.toObject();
+    for(QJsonArray &ary : m_online_list){
+        if(m_online_list.key(ary) == _sender){
+            continue;
+        }
+        online_json_array.append(ary.first().toObject());
     }
+
     sendToClient(online_json_array, _sender);
 }
 

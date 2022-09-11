@@ -16,7 +16,7 @@ public:
     static void connectToDatabase();
 
     static QJsonArray getUsers();
-    static QJsonArray getAuth(QString _login, QString _password);
+    static QJsonArray getAuth(const QString _login, const QString _password);
 
 private:
     static QSqlDatabase m_manager;

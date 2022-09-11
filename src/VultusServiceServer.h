@@ -27,8 +27,8 @@ private slots:
     void readyReadMessage();
     void sendToClient(QJsonArray _msg, QTcpSocket *_socket);
 
-    void addToOnlineClient(QJsonArray _reply, QTcpSocket* _sender);
     void rmvToOnlineClient();
+    void addToOnlineClient(QJsonArray _reply, QTcpSocket* _sender);
     void sendIsOnlineUsers(QTcpSocket* _sender);
 
 private:
