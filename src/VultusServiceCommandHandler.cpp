@@ -1,16 +1,21 @@
 #include "VultusServiceCommandHandler.h"
 
 
-VultusServiceCommandHandler::VultusServiceCommandHandler(QObject *parent)
-    : QObject{parent}
+VultusServiceCommandHandler::VultusServiceCommandHandler()
+{
+
+}
+
+VultusServiceCommandHandler::~VultusServiceCommandHandler()
 {
 
 }
 
 void VultusServiceCommandHandler::processCommand(QJsonArray _command, QTcpSocket *_sender)
 {
-    QJsonObject command_object = _command.first().toObject();
-    QString command = command_object["COMMAND"].toString();
+    QJsonObject command_header = _command.first().toObject();
+    QJsonObject command_payload = _command.end()->toObject();
+    QString command = command_header["COMMAND"].toString();
     if(command == "getUsers"){
         QJsonArray response = VultusDatabaseManager::getUsers();
         if(response.size() > 1){
@@ -28,11 +33,12 @@ void VultusServiceCommandHandler::processCommand(QJsonArray _command, QTcpSocket
 
 void VultusServiceCommandHandler::authCommand(QJsonArray _command, QTcpSocket *_sender)
 {
-    QJsonObject command_object = _command[0].toObject();
-    QString command = command_object["COMMAND"].toString();
+    QJsonObject command_header = _command.first().toObject();
+    QJsonObject command_payload = _command.last().toObject();
+    QString command = command_header["COMMAND"].toString();
     if(command == "authToServer"){
-        QJsonArray response =  VultusDatabaseManager::getAuth(command_object["LOGIN"].toString(),
-                                                              command_object["PASSWORD"].toString());
+        QJsonArray response =  VultusDatabaseManager::getAuth(command_payload["LOGIN"].toString(),
+                                                              command_payload["PASSWORD"].toString());
         if(response.size() == 1){
 //            QJsonArray token = generateToken(response.first().toObject()["id"].toInt(),
 //                                             response.first().toObject()["last_name"].toString());

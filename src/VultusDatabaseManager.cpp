@@ -5,6 +5,11 @@ VultusDatabaseManager::VultusDatabaseManager()
 
 }
 
+VultusDatabaseManager::~VultusDatabaseManager()
+{
+
+}
+
 void VultusDatabaseManager::connectToDatabase()
 {
     m_manager.setHostName("localhost");

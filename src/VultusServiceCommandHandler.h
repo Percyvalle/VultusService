@@ -25,7 +25,8 @@ class VultusServiceCommandHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit VultusServiceCommandHandler(QObject *parent = nullptr);
+    VultusServiceCommandHandler();
+    ~VultusServiceCommandHandler();
 
     void processCommand(QJsonArray _command, QTcpSocket*_sender);
     void authCommand(QJsonArray _command, QTcpSocket*_sender);
