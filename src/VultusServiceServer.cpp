@@ -19,6 +19,7 @@ VultusServiceServer::VultusServiceServer()
 VultusServiceServer::~VultusServiceServer()
 {
     delete m_socket;
+    delete m_handler;
 }
 
 
@@ -26,9 +27,6 @@ void VultusServiceServer::incomingConnection(qintptr _socket_discriptor)
 {
     m_socket = new QTcpSocket;
     m_socket->setSocketDescriptor(_socket_discriptor);
-    m_socket_list.append(m_socket);
-
-    m_security_list.insert(m_socket, notsafe);
 
     connect(m_socket, &QIODevice::readyRead, this, &VultusServiceServer::readyReadMessage);
     connect(m_socket, &QAbstractSocket::disconnected, this, &VultusServiceServer::rmvToOnlineClient);
@@ -54,16 +52,15 @@ void VultusServiceServer::sendToClient(QJsonArray _msg, QTcpSocket *_socket)
 void VultusServiceServer::addToOnlineClient(QJsonArray _reply, QTcpSocket *_sender)
 {
     m_socket = _sender;
-    m_security_list[_sender] = safely;
     m_online_list.insert(_sender, _reply);
 
+    qDebug() << m_online_list;
     sendToClient(_reply, _sender);
 }
 
 void VultusServiceServer::rmvToOnlineClient()
 {
     m_socket = (QTcpSocket*)sender();
-    m_security_list.remove(m_socket);
     m_online_list.remove(m_socket);
 }
 
@@ -105,12 +102,8 @@ void VultusServiceServer::readyReadMessage()
         in >> request_var;
 
         QJsonArray request = request_var.toJsonArray();
-        if(m_security_list[m_socket] == notsafe){
-            m_handler->authCommand(request, m_socket);
-        } else {
-            m_handler->processCommand(request, m_socket);
-        }
-
+        m_handler->authCommand(request, m_socket);
+        m_handler->processCommand(request, m_socket);
     }
 }
 

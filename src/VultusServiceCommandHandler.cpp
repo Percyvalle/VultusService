@@ -34,10 +34,10 @@ void VultusServiceCommandHandler::authCommand(QJsonArray _command, QTcpSocket *_
         QJsonArray response =  VultusDatabaseManager::getAuth(command_object["LOGIN"].toString(),
                                                               command_object["PASSWORD"].toString());
         if(response.size() == 1){
-            QJsonArray token = generateToken(response.first().toObject()["id"].toInt(),
-                                             response.first().toObject()["last_name"].toString());
-            response.push_front(token.first());
-            response.push_front(token.last());
+//            QJsonArray token = generateToken(response.first().toObject()["id"].toInt(),
+//                                             response.first().toObject()["last_name"].toString());
+//            response.push_front(token.first());
+//            response.push_front(token.last());
 
             emit authSendResponse(response, _sender);
             return;

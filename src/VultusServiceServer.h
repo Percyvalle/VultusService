@@ -33,11 +33,10 @@ private slots:
 
 private:
     VultusServiceCommandHandler *m_handler = new VultusServiceCommandHandler;
-    QVector<QTcpSocket*> m_socket_list;
-    QMap<QTcpSocket*, int> m_security_list;
-    QMap<QTcpSocket*, QJsonArray> m_online_list;
-    quint16 m_block_size=0;
+    QMap<QTcpSocket*, QJsonArray> m_secure_list; // Сюда должен идти JWT токен
+    QMap<QTcpSocket*, QJsonArray> m_online_list; // Сюда вся информаци о пользователях в сети
     QTcpSocket *m_socket;
+    quint16 m_block_size=0;
     QByteArray m_data;
 };
 
