@@ -30,6 +30,7 @@ public:
 
     void processCommand(QJsonArray _command, QTcpSocket*_sender);
     void authCommand(QJsonArray _command, QTcpSocket*_sender);
+    void addHeaderResponse(QJsonArray& _reply, QString _response_name);
 
 private:
     QJsonArray generateToken(const int &_id, const QString &_last_name);

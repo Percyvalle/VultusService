@@ -66,6 +66,7 @@ void VultusServiceServer::rmvToOnlineClient()
 
 void VultusServiceServer::sendIsOnlineUsers(QTcpSocket *_sender)
 {
+
     QJsonArray online_json_array;
     for(QJsonArray &ary : m_online_list){
         if(m_online_list.key(ary) == _sender){
@@ -74,6 +75,7 @@ void VultusServiceServer::sendIsOnlineUsers(QTcpSocket *_sender)
         online_json_array.append(ary.first().toObject());
     }
 
+    m_handler->addHeaderResponse(online_json_array, "getIsOnlineUsersResponse");
     sendToClient(online_json_array, _sender);
 }
 
