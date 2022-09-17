@@ -41,6 +41,7 @@ void VultusServiceServer::sendToClient(QJsonArray _msg, QTcpSocket *_socket)
     m_data.clear();
     QDataStream out(&m_data, QIODevice::WriteOnly);
 
+    qDebug() << _msg;
     out.setVersion(QDataStream::Qt_5_15);
     out << quint16(0) << QVariant(_msg);
     out.device()->seek(0);
@@ -54,7 +55,6 @@ void VultusServiceServer::addToOnlineClient(QJsonArray _reply, QTcpSocket *_send
     m_socket = _sender;
     m_online_list.insert(_sender, _reply);
 
-    qDebug() << m_online_list;
     sendToClient(_reply, _sender);
 }
 
@@ -104,6 +104,7 @@ void VultusServiceServer::readyReadMessage()
         in >> request_var;
 
         QJsonArray request = request_var.toJsonArray();
+        qDebug() << request;
         m_handler->authCommand(request, m_socket);
         m_handler->processCommand(request, m_socket);
     }

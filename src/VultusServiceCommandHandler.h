@@ -10,7 +10,7 @@
 #include "VultusDatabaseManager.h"
 
 struct JsonMessage{
-    static QJsonArray error_msg(const QString _error){
+    static QJsonArray errorMsg(const QString _error){
         QJsonObject m_object_jsn;
         QJsonArray m_array_jsn;
 

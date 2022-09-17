@@ -23,12 +23,13 @@ void VultusServiceCommandHandler::processCommand(QJsonArray _command, QTcpSocket
             emit getUsersResponse(response, _sender);
             return;
         } else {
-            emit errorResponse(JsonMessage::error_msg("Ошибка получения пользователей"), _sender);
+            emit errorResponse(JsonMessage::errorMsg("Ошибка получения пользователей"), _sender);
             return;
         }
     }
     else if(command == "getOnlineUsers"){
         emit getIsOnlineUsers(_sender);
+        return;
     }
 }
 
@@ -49,12 +50,11 @@ void VultusServiceCommandHandler::authCommand(QJsonArray _command, QTcpSocket *_
 //            response.push_front(token.last());
 
 
-            qDebug() << response;
             addHeaderResponse(response, "authToServerResponse");
             emit authSendResponse(response, _sender);
             return;
         } else {
-            emit errorResponse(JsonMessage::error_msg("Неправильно введен пароль или логин"), _sender);
+            emit errorResponse(JsonMessage::errorMsg("Неправильно введен пароль или логин"), _sender);
             return;
         }
     }
