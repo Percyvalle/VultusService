@@ -41,7 +41,7 @@ QJsonArray VultusDatabaseManager::getUsers()
         profile_object["phone"] = m_query->value("phone").toJsonValue();
         profile_object["workphone"] = m_query->value("workphone").toJsonValue();
         profile_object["workplace"] = m_query->value("workplace").toJsonValue();
-        profile_object["birthday"] = m_query->value("birthday").toJsonValue();
+        profile_object["birthday"] = m_query->value("birthday").toString();
         profile_object["description"] = m_query->value("description").toJsonValue();
         profile_object["status_text"] = m_query->value("status_text").toJsonValue();
         profile_object["status"] = m_query->value("status").toJsonValue();
