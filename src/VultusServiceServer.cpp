@@ -43,7 +43,7 @@ void VultusServiceServer::sendToClient(QJsonArray _msg, QTcpSocket *_socket)
 
     qDebug() << _msg;
     out.setVersion(QDataStream::Qt_5_15);
-    out << quint16(0) << QVariant(_msg);
+    out << quint16(0) << _msg;
     out.device()->seek(0);
     out << quint16(m_data.size() - sizeof(quint16));
 
@@ -100,10 +100,8 @@ void VultusServiceServer::readyReadMessage()
             m_block_size = 0;
         }
 
-        QVariant request_var;
-        in >> request_var;
-
-        QJsonArray request = request_var.toJsonArray();
+        QJsonArray request;
+        in >> request;
         qDebug() << request;
         m_handler->authCommand(request, m_socket);
         m_handler->processCommand(request, m_socket);
