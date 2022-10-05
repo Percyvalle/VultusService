@@ -12,7 +12,7 @@ VultusDatabaseManager::~VultusDatabaseManager()
 
 void VultusDatabaseManager::connectToDatabase()
 {
-    m_manager.setHostName("localhost");
+    m_manager.setHostName("192.168.253.1");
     m_manager.setPort(5432);
     m_manager.setDatabaseName("vultus");
     m_manager.setUserName("percy");

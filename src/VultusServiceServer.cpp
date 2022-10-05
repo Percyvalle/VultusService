@@ -2,7 +2,7 @@
 
 VultusServiceServer::VultusServiceServer()
 {
-    if(listen(QHostAddress("192.168.0.182"), 2000)){
+    if(listen(QHostAddress("192.168.253.134"), 2000)){
         qDebug() << "Start";
 
         VultusDatabaseManager::connectToDatabase();
@@ -42,8 +42,9 @@ void VultusServiceServer::sendToClient(QJsonArray _msg, QTcpSocket *_socket)
     QDataStream out(&m_data, QIODevice::WriteOnly);
 
     qDebug() << _msg;
-    out.setVersion(QDataStream::Qt_5_15);
-    out << quint16(0) << _msg;
+    out.setVersion(QDataStream::Qt_5_11);
+
+    out << quint16(0) << QVariant(QJsonDocument(_msg).toJson());
     out.device()->seek(0);
     out << quint16(m_data.size() - sizeof(quint16));
 
@@ -79,12 +80,13 @@ void VultusServiceServer::sendIsOnlineUsers(QTcpSocket *_sender)
     sendToClient(online_json_array, _sender);
 }
 
+#include <QXmlStreamReader>
 void VultusServiceServer::readyReadMessage()
 {
     m_socket = (QTcpSocket*)sender();
 
     QDataStream in(m_socket);
-    in.setVersion(QDataStream::Qt_5_15);
+    in.setVersion(QDataStream::Qt_5_11);
 
     if(in.status() == QDataStream::Ok){
         if(m_block_size == 0){
@@ -100,11 +102,13 @@ void VultusServiceServer::readyReadMessage()
             m_block_size = 0;
         }
 
-        QJsonArray request;
+        QVariant request;
         in >> request;
-        qDebug() << request;
-        m_handler->authCommand(request, m_socket);
-        m_handler->processCommand(request, m_socket);
+        QJsonDocument json_request = QJsonDocument::fromJson(QString(request.toByteArray().data()).toUtf8());
+        qDebug() << json_request.array();
+
+        m_handler->authCommand(json_request.array(), m_socket);
+        m_handler->processCommand(json_request.array(), m_socket);
     }
 }
 
