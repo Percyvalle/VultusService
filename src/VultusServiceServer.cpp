@@ -2,7 +2,7 @@
 
 VultusServiceServer::VultusServiceServer()
 {
-    if(listen(QHostAddress("192.168.253.134"), 2000)){
+    if(listen(QHostAddress("192.168.0.182"), 2000)){
         qDebug() << "Start";
 
         VultusDatabaseManager::connectToDatabase();
