@@ -18,6 +18,8 @@ public:
     static QJsonArray getUsers();
     static QJsonArray getAuth(const QString _login, const QString _password);
 
+    static void setOnlineUser(const int _id, const QString _status);
+
 private:
     static QSqlDatabase m_manager;
     static QSqlQuery *m_query;

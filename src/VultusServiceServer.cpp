@@ -2,7 +2,7 @@
 
 VultusServiceServer::VultusServiceServer()
 {
-    if(listen(QHostAddress("192.168.0.182"), 2000)){
+    if(listen(QHostAddress("localhost"), 2000)){
         qDebug() << "Start";
 
         VultusDatabaseManager::connectToDatabase();
@@ -107,7 +107,6 @@ void VultusServiceServer::readyReadMessage()
         QJsonDocument json_request = QJsonDocument::fromJson(QString(request.toByteArray().data()).toUtf8());
         qDebug() << json_request.array();
 
-        m_handler->authCommand(json_request.array(), m_socket);
         m_handler->processCommand(json_request.array(), m_socket);
     }
 }

@@ -14,9 +14,22 @@ VultusServiceCommandHandler::~VultusServiceCommandHandler()
 void VultusServiceCommandHandler::processCommand(QJsonArray _command, QTcpSocket *_sender)
 {
     QJsonObject command_header = _command.first().toObject();
-    QJsonObject command_payload = _command.end()->toObject();
+    QJsonObject command_payload = _command.last().toObject();
     QString command = command_header["COMMAND"].toString();
-    if(command == "getUsers"){
+    if(command == "authToServer"){
+        QJsonArray response =  VultusDatabaseManager::getAuth(command_payload["LOGIN"].toString(),
+                                                              command_payload["PASSWORD"].toString());
+        if(!response.first().toObject().isEmpty()){
+            VultusDatabaseManager::setOnlineUser(response.first().toObject()["id"].toInt(), "true");
+
+            addHeaderResponse(response, "authToServerResponse");
+            emit authSendResponse(response, _sender);
+            return;
+        } else {
+            emit errorResponse(JsonMessage::errorMsg("Неправильно введен пароль или логин"), _sender);
+            return;
+        }
+    }else if(command == "getUsers"){
         QJsonArray response = VultusDatabaseManager::getUsers();
         if(response.size() > 1){
             addHeaderResponse(response, "getUsersResponse");
@@ -26,39 +39,13 @@ void VultusServiceCommandHandler::processCommand(QJsonArray _command, QTcpSocket
             emit errorResponse(JsonMessage::errorMsg("Ошибка получения пользователей"), _sender);
             return;
         }
-    }
-    else if(command == "getOnlineUsers"){
+    }else if(command == "getOnlineUsers"){
         emit getIsOnlineUsers(_sender);
         return;
     }
 }
 
-void VultusServiceCommandHandler::authCommand(QJsonArray _command, QTcpSocket *_sender)
-{
-    QJsonObject command_header = _command.first().toObject();
-    QJsonObject command_payload = _command.last().toObject();
-    QString command = command_header["COMMAND"].toString();
-    if(command == "authToServer"){
-        QJsonArray response =  VultusDatabaseManager::getAuth(command_payload["LOGIN"].toString(),
-                                                              command_payload["PASSWORD"].toString());
-        if(!response.first().toObject().isEmpty()){
 
-//            Генерация JWT токена будет добавлена позже
-//            QJsonArray token = generateToken(response.first().toObject()["id"].toInt(),
-//                                             response.first().toObject()["last_name"].toString());
-//            response.push_front(token.first());
-//            response.push_front(token.last());
-
-
-            addHeaderResponse(response, "authToServerResponse");
-            emit authSendResponse(response, _sender);
-            return;
-        } else {
-            emit errorResponse(JsonMessage::errorMsg("Неправильно введен пароль или логин"), _sender);
-            return;
-        }
-    }
-}
 
 QJsonArray VultusServiceCommandHandler::generateToken(const int &_id, const QString &_last_name)
 {

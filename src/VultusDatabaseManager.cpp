@@ -30,7 +30,7 @@ QJsonArray VultusDatabaseManager::getUsers()
     QJsonObject profile_object;
     QJsonArray profile_array;
 
-    m_query->exec("SELECT * FROM profile_Table");
+    m_query->exec("SELECT * FROM profile_table");
     while(m_query->next()){
         profile_object["id"] = m_query->value("id").toJsonValue();
         profile_object["full_name"] = m_query->value("full_name").toJsonValue();
@@ -77,6 +77,12 @@ QJsonArray VultusDatabaseManager::getAuth(const QString _login, const QString _p
     profile_main_array.append(profile_main_object);
 
     return profile_main_array;
+}
+
+void VultusDatabaseManager::setOnlineUser(const int _id, const QString _status)
+{
+    m_query->exec("UPDATE auth_profile_table SET active=" + _status + " WHERE id_profile="+ QString::number(_id));
+    qDebug() << m_query->lastQuery();
 }
 
 QSqlDatabase VultusDatabaseManager::m_manager = QSqlDatabase::addDatabase("QPSQL");

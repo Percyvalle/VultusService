@@ -29,7 +29,6 @@ public:
     ~VultusServiceCommandHandler();
 
     void processCommand(QJsonArray _command, QTcpSocket*_sender);
-    void authCommand(QJsonArray _command, QTcpSocket*_sender);
     void addHeaderResponse(QJsonArray& _reply, QString _response_name);
 
 private:
